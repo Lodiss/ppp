@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kalkulator Health Tier – Modern</title>
+<style>
+  :root{
+    /* === DARK THEME (default) === */
+    --bg: #0b1020;
+    --bg2:#0e1429;
+    --card:#121a34;
+    --muted:#9aa3b2;
+    --text:#e6e8ef;
+    --ring:#2d3b73;
+    --shadow: 0 10px 30px rgba(0,0,0,.45);
+    --border: rgba(255,255,255,.06);
+    --border-strong: #1c2446;
+    --grad: radial-gradient(1000px 500px at 50% -100px, rgba(98,114,255,.25), transparent 60%),
+            radial-gradient(800px 400px at 100% 0%, rgba(255,98,214,.18), transparent 60%),
+            radial-gradient(600px 500px at 0% 0%, rgba(74,222,128,.12), transparent 60%);
+
+    /* Tier colors */
+    --tier-s:#1db954;      /* hijau tua */
+    --tier-a:#7cf69a;      /* hijau muda */
+    --tier-b:#ffd866;      /* kuning */
+    --tier-c:#ff9e64;      /* oranye */
+    --tier-d:#ff5c5c;      /* merah */
+  }
+
+  /* === LIGHT THEME OVERRIDES === */
+  html[data-theme="light"]{
+    --bg:#f6f7fb;
+    --bg2:#ffffff;
+    --card:#ffffff;
+    --muted:#55627a;
+    --text:#111525;
+    --ring:#cfd6ff;
+    --shadow: 0 10px 30px rgba(24,33,77,.1);
+    --border: rgba(15,23,42,.08);
+    --border-strong:#e6e9f5;
+    --grad: radial-gradient(1000px 500px at 50% -120px, rgba(98,114,255,.18), transparent 60%),
+            radial-gradient(800px 400px at 100% 0%, rgba(255,98,214,.12), transparent 60%),
+            radial-gradient(600px 500px at 0% 0%, rgba(74,222,128,.1), transparent 60%);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:var(--bg); color:var(--text); font: 16px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+  .bgfx{position:fixed; inset:0; background:var(--grad); z-index:-1; filter:saturate(115%)}
+
+  /* --- Doodle background --- */
+  .bgfx::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    background-image:
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff9e64"><path d="M10 20v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"/><path d="M4.14 12.82a2 2 0 0 0-1.74 1.1l-.86 2.05a.5.5 0 0 0 .54.72h20a.5.5 0 0 0 .54-.72l-.86-2.05a2 2 0 0 0-1.74-1.1"/><path d="M7.5 16h9"/><path d="M4.14 12.82A2 2 0 0 1 6 12h12a2 2 0 0 1 1.86.82"/><path d="M12 2v2"/></svg>'),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a2b3ff"><path d="M8 2h8"/><path d="M22 17.77a1 1 0 0 1-.32 1.3L16.2 22h-8.4l-5.5-2.93a1 1 0 0 1-.32-1.3L5.8 4.77A2 2 0 0 1 7.42 3h9.16a2 2 0 0 1 1.62 1.77z"/><path d="M7 15h9"/></svg>'),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%237cf69a"><path d="M12.22 13.98l-7.16-.01A3.89 3.89 0 0 1 5.3 6.94C6.54 5.92 8.35 6 10 7a3.94 3.94 0 0 0 4-3.5 3.93 3.93 0 0 0-1-2.5c-.7-.5-1.92-.17-2.6.5a2 2 0 0 1-2.5 0A3.89 3.89 0 0 1 2 9.24V21a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-6.23a3.89 3.89 0 0 1 1-6.1z"/></svg>'),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd866"><path d="M16 16.22c-.69.23-1.47.45-2.48.74-4.82 1.4-8.08.76-8.08-.74s3.26-2.14 8.08-.74c1.01.29 1.79.51 2.48.74z"/><path d="M22 12s-3.79-1-7-1c-3.1 0-6.12 1.13-7 2.5-.88 1.37-2 4-2 4a3.8 3.8 0 0 1 0 7c.72.78 2.05 1 4 1a22.46 22.46 0 0 0 5-1c.14 0 .28 0 .42-.01"/></svg>'),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231db954"><path d="M12 21a2 2 0 0 0 2-2v-4.38a3 3 0 1 0-4 0V19a2 2 0 0 0 2 2z"/><path d="M18 20c.93-1.87 1.87-4.8 2-7.5a1.5 1.5 0 0 0-3 0c-.54 2.68-1 4.5-1 5a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2c0-.5-1.46-2.32-2-5a1.5 1.5 0 0 0-3 0c.13 2.7.92 5.63 2 7.5"/></svg>'),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23a76cff"><path d="m12 21-8-8a5 5 0 1 1 10-2.02V12a2 2 0 1 0 4 0v-.02a5 5 0 1 1 8 8z"/></svg>');
+    background-repeat: no-repeat;
+    background-size: 80px, 60px, 70px, 90px, 75px, 65px;
+    background-position: 10% 20%, 85% 70%, 30% 90%, 70% 30%, 50% 50%, 95% 10%;
+    animation: float-doodles 30s ease-in-out infinite alternate;
+  }
+  html[data-theme="light"] .bgfx::after{ opacity:.1; filter:none; }
+
+  @keyframes float-doodles { from {transform: translateY(-5px) rotate(0deg);} to {transform: translateY(5px) rotate(3deg);} }
+
+  /* Theme toggle (fixed) */
+  .theme-toggle{
+    position:fixed; top:14px; right:14px; z-index:10;
+    display:inline-flex; align-items:center; gap:10px;
+    border:1px solid var(--border); background:var(--card); color:var(--text);
+    border-radius:999px; padding:10px 14px; font-weight:700; cursor:pointer;
+    box-shadow:var(--shadow);
+  }
+  .theme-toggle svg{width:18px;height:18px}
+
+  header{max-width:1100px; margin:28px auto 6px; padding:0 16px}
+  h1{font-size: clamp(24px, 4vw, 36px); margin:0; font-weight:800; letter-spacing:.3px}
+  .sub{margin:8px 0 0; color:var(--muted)}
+
+  .wrap{max-width:1100px; margin:18px auto 40px; padding:0 16px}
+  .grid{display:grid; grid-template-columns:1fr; gap:16px}
+  @media(min-width:900px){.grid{grid-template-columns: 380px 1fr}}
+
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)); border:1px solid var(--border); border-radius:20px; padding:16px; box-shadow:var(--shadow)}
+  html[data-theme="light"] .card{background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.01))}
+  .card h2{margin:4px 0 12px; font-size:18px}
+
+  .field{margin:10px 0}
+  .label{font-size:13px; color:var(--muted); margin-bottom:6px}
+  .input{width:100%; background:var(--bg2); color:var(--text); padding:12px 14px; border-radius:12px; border:1px solid var(--border-strong); outline:none; transition: .2s border, .2s box-shadow}
+  .input:focus{border-color: #6a7bff; box-shadow:0 0 0 6px rgba(106,123,255,.12)}
+  html[data-theme="light"] .input{border-color:#e2e7ff}
+
+  .controls{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+  .btn{display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,#6a7bff,#a76cff); color:white; border:none; border-radius:12px; padding:12px 18px; font-weight:700; letter-spacing:.3px; cursor:pointer; box-shadow:0 10px 25px rgba(123,97,255,.28); transition: transform .08s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn.secondary{background:linear-gradient(135deg,#2a335e,#3b4579); font-weight:600}
+  html[data-theme="light"] .btn.secondary{background:linear-gradient(135deg,#eaefff,#dfe6ff); color:#222}
+  .btn.ghost{background:transparent; border:1px solid #27305e; color:#cfd6ff; font-weight:600}
+  html[data-theme="light"] .btn.ghost{border-color:#d2d9ff; color:#3a4590}
+
+  /* cards for results */
+  .results{display:grid; grid-template-columns:1fr; gap:14px}
+  @media(min-width:720px){.results{grid-template-columns:repeat(2, 1fr)}}
+  @media(min-width:1100px){.results{grid-template-columns:repeat(3, 1fr)}}
+
+  .nutri-card{position:relative; background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:var(--shadow); overflow:hidden}
+  .nutri-head{display:flex; align-items:center; gap:12px; margin-bottom:10px}
+  .nutri-title{font-weight:800}
+  .nutri-value{color:var(--muted); font-size:13px}
+  .nutri-note{margin-top:10px; color:#cdd3df; font-size:13px}
+  html[data-theme="light"] .nutri-note{color:#46506b}
+
+  .badge{position:absolute; top:14px; right:14px; font-weight:900; padding:6px 10px; border-radius:10px; color:#0b0b0b; text-shadow:0 0 10px rgba(0,0,0,.25); box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .glow{filter: drop-shadow(0 0 14px rgba(255,255,255,.22));}
+  html[data-theme="light"] .glow{filter:none}
+
+  .tier-s{background:linear-gradient(135deg, var(--tier-s), #0ecf71); color:#08140d}
+  .tier-a{background:linear-gradient(135deg, var(--tier-a), #b7ffce)}
+  .tier-b{background:linear-gradient(135deg, var(--tier-b), #ffe8a6)}
+  .tier-c{background:linear-gradient(135deg, var(--tier-c), #ffc19c); color:#1e0f0a}
+  .tier-d{background:linear-gradient(135deg, var(--tier-d), #ff8a8a); color:#140808}
+
+  .icon{width:40px; height:40px; flex:0 0 40px}
+  .icon svg{width:100%; height:100%;}
+
+  .conclusion{margin-top:18px; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:var(--shadow)}
+  .hidden{display:none}
+
+  .fade-in{opacity:0; transform: translateY(6px); animation: enter .35s ease forwards}
+  @keyframes enter{to{opacity:1; transform:translateY(0)}}
+
+  .fade-in-1{animation-delay:.15s}
+  .fade-in-2{animation-delay:.30s}
+  .fade-in-3{animation-delay:.45s}
+
+  footer{max-width:1100px; margin:0 auto 24px; padding:0 16px; color:var(--muted); font-size:12px}
+
+  /* Landing page */
+  #landing-page{
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    min-height:100vh; padding:20px; text-align:center;
+  }
+  #landing-page .intro-card {
+    max-width: 600px; padding: 60px 30px;
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid var(--border);
+    border-radius:20px; box-shadow:var(--shadow);
+  }
+  #landing-page h1{
+    font-size: clamp(32px, 8vw, 56px); font-weight:900; margin:0; line-height:1.1; letter-spacing:.5px;
+    background: linear-gradient(135deg, #a2b3ff, #ff9de6);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  #landing-page .sub{font-size: clamp(16px, 2.5vw, 20px); margin: 10px auto 30px; line-height:1.5; max-width: 500px;}
+  #landing-page .btn{padding: 16px 32px; font-size: 1.2rem; box-shadow: 0 10px 25px rgba(123,97,255,.4)}
+  .watermark{margin-top: 24px; font-size: .8rem; color: #55627a; line-height:1.6}
+
+  /* Results page */
+  #results-page{max-width:1100px; margin:0 auto; padding:0 16px;}
+  .results-header{margin:28px 0 16px; display:flex; align-items:center; justify-content: space-between; gap:20px;}
+  .results-header h1{flex-grow:1;}
+  .results-content{display:grid; grid-template-columns:1fr; gap:24px;}
+  @media(min-width:900px){.results-content{grid-template-columns: 1fr 2fr}}
+
+  .overall-summary{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid var(--border); border-radius:18px; padding:20px; box-shadow:var(--shadow);}
+  .overall-summary h2{margin:0 0 10px; font-size:1.5rem; font-weight:800;}
+  .overall-summary .tier-badge{display:inline-block; font-size:1.2rem; font-weight:900; padding:8px 14px; border-radius:12px; margin-bottom:10px;}
+  .overall-summary p{font-size:1rem; line-height:1.6; margin-bottom:1em;}
+
+  /* Benefits + CTA (as original) */
+  .benefits-section{max-width:1100px; margin:28px auto; padding:0 16px;}
+  .benefits-section h2{font-size:24px; margin-bottom:16px;}
+  .benefits-grid{display:grid; grid-template-columns:1fr; gap:16px;}
+  @media(min-width:600px){.benefits-grid{grid-template-columns:repeat(2, 1fr)}}
+  @media(min-width:900px){.benefits-grid{grid-template-columns:repeat(3, 1fr)}}
+  .benefits-item{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; box-shadow:var(--shadow);}
+  .benefits-item h3{font-size:18px; font-weight:700; margin:0 0 8px;}
+  .benefits-item p{font-size:14px; color:var(--muted); margin:0;}
+  .cta-section{text-align:center; margin-top:40px; padding:30px 20px; background:var(--card); border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow);}
+  .cta-section h2{margin:0 0 12px; font-size:28px; font-weight:800; background: linear-gradient(135deg, #a2b3ff, #ff9de6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;}
+
+  /* Error message */
+  .error-message {color: #ff5c5c; font-size: 14px; margin-top: 10px; font-weight: 600; text-align: center;}
+
+  /* === History styles === */
+  .history-list{display:flex; flex-direction:column; gap:10px; max-height:360px; overflow:auto;}
+  .history-item{
+    display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center;
+    padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--bg2);
+  }
+  .history-title{font-weight:700}
+  .history-meta{font-size:12px; color:var(--muted)}
+  .pill{display:inline-block; font-weight:900; padding:4px 8px; border-radius:999px; font-size:12px; margin-left:6px}
+  .pill.tier-s{background:linear-gradient(135deg, var(--tier-s), #0ecf71); color:#08140d}
+  .pill.tier-a{background:linear-gradient(135deg, var(--tier-a), #b7ffce)}
+  .pill.tier-b{background:linear-gradient(135deg, var(--tier-b), #ffe8a6)}
+  .pill.tier-c{background:linear-gradient(135deg, var(--tier-c), #ffc19c); color:#1e0f0a}
+  .pill.tier-d{background:linear-gradient(135deg, var(--tier-d), #ff8a8a); color:#140808}
+  .history-actions{display:flex; gap:8px}
+  .empty-note{color:var(--muted); font-size:14px}
+</style>
+</head>
+<body>
+  <div class="bgfx" aria-hidden="true"></div>
+
+  <!-- THEME TOGGLE -->
+  <button id="themeToggleBtn" class="theme-toggle" aria-pressed="false" aria-label="Toggle tema">
+    <span id="themeIcon" aria-hidden="true">
+      <!-- moon -->
+      <svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2"/></svg>
+    </span>
+    <span id="themeLabel">Dark</span>
+  </button>
+
+  <!-- Landing -->
+  <main id="landing-page">
+    <div class="intro-card fade-in">
+      <h1 class="fade-in-1">Kalkulator Health Tier</h1>
+      <p class="sub fade-in-2"><strong>Ketahui kualitas nutrisi makanan Anda dengan mudah dan buat pilihan makan yang lebih sehat.</strong></p>
+      <button class="btn fade-in-3" id="startBtn">Mulai</button>
+      <div class="watermark">
+        <strong>NAMA KELOMPOK:</strong><br>
+        - EDWARD PARVEZ SUBHAN (10)<br>
+        - LA ODE MUHAMMAD ALDI RP (21)<br>
+        - RAKHA KEANDRE MAHARDIKA (32)
+      </div>
+    </div>
+  </main>
+
+  <!-- App -->
+  <main id="calculator-app" style="display:none;">
+    <header>
+      <h1>Health Tier Calculator</h1>
+      <p class="sub"><strong>Isi data nutrisi per 100 gram, klik Cek, dan dapatkan tier tiap nutrisi, ringkasan formal, serta rekomendasi konsumsi.</strong></p>
+    </header>
+
+    <!-- Manfaat Nutrisi -->
+    <div class="benefits-section">
+      <div class="card">
+        <h2>Pentingnya Setiap Nutrisi</h2>
+        <div class="benefits-grid">
+          <div class="benefits-item"><h3>Energi (kJ)</h3><p><strong>Fungsi:</strong> Sumber bahan bakar utama bagi tubuh untuk semua aktivitas.<br><strong>Risiko:</strong> Kelebihan energi dapat menyebabkan kenaikan berat badan.</p></div>
+          <div class="benefits-item"><h3>Lemak Jenuh (g)</h3><p><strong>Fungsi:</strong> Membentuk membran sel dan hormon.<br><strong>Risiko:</strong> Konsumsi berlebihan meningkatkan kolesterol jahat dan risiko penyakit jantung.</p></div>
+          <div class="benefits-item"><h3>Gula (g)</h3><p><strong>Fungsi:</strong> Sumber energi cepat.<br><strong>Risiko:</strong> Asupan tinggi dikaitkan dengan obesitas, diabetes tipe 2, dan masalah gigi.</p></div>
+          <div class="benefits-item"><h3>Natrium (mg)</h3><p><strong>Fungsi:</strong> Menjaga keseimbangan cairan dan fungsi saraf.<br><strong>Risiko:</strong> Asupan berlebih dapat menyebabkan hipertensi (tekanan darah tinggi).</p></div>
+          <div class="benefits-item"><h3>Serat (g)</h3><p><strong>Fungsi:</strong> Mendukung kesehatan pencernaan, menjaga kadar gula darah, dan memberikan rasa kenyang.<br><strong>Risiko:</strong> Kekurangan serat bisa menyebabkan sembelit dan masalah usus.</p></div>
+          <div class="benefits-item"><h3>Protein (g)</h3><p><strong>Fungsi:</strong> Membangun dan memperbaiki jaringan tubuh, enzim, dan hormon.<br><strong>Risiko:</strong> Asupan yang tidak memadai dapat mengganggu pertumbuhan dan perbaikan sel.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap grid">
+      <!-- Form -->
+      <div class="card" role="form" aria-labelledby="formTitle">
+        <h2 id="formTitle">Input Data</h2>
+        <div class="field">
+          <label class="label" for="foodName">Nama Makanan</label>
+          <input id="foodName" type="text" class="input" placeholder="mis. Burger Keju" />
+        </div>
+        <div class="field">
+          <label class="label" for="energy">Energi (kJ per 100 g)</label>
+          <input id="energy" type="number" min="0" step="1" class="input" placeholder="mis. 350" inputmode="decimal" />
+        </div>
+        <div class="field">
+          <label class="label" for="fat">Lemak Jenuh (g per 100 g)</label>
+          <input id="fat" type="number" min="0" step="0.1" class="input" placeholder="mis. 1.2" inputmode="decimal" />
+        </div>
+        <div class="field">
+          <label class="label" for="sugar">Gula (g per 100 g)</label>
+          <input id="sugar" type="number" min="0" step="0.1" class="input" placeholder="mis. 7.5" inputmode="decimal" />
+        </div>
+        <div class="field">
+          <label class="label" for="sodium">Natrium (mg per 100 g)</label>
+          <input id="sodium" type="number" min="0" step="1" class="input" placeholder="mis. 320" inputmode="numeric" />
+        </div>
+        <hr style="margin:20px 0; border-color:var(--border)"/>
+        <div class="field">
+          <label class="label" for="fiber">Serat (g per 100 g)</label>
+          <input id="fiber" type="number" min="0" step="0.1" class="input" placeholder="mis. 3.5" inputmode="decimal" />
+        </div>
+        <div class="field">
+          <label class="label" for="protein">Protein (g per 100 g)</label>
+          <input id="protein" type="number" min="0" step="0.1" class="input" placeholder="mis. 12.0" inputmode="decimal" />
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="checkBtn" type="button" aria-label="Cek hasil">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M13 3L4 14h6l-1 7 9-11h-6l1-7z" fill="url(#g1)"/><defs><linearGradient id="g1" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#a2b3ff"/><stop offset="1" stop-color="#ff9de6"/></linearGradient></defs></svg>
+            Cek
+          </button>
+          <button class="btn secondary" id="sampleBtn" type="button">Isi Contoh</button>
+          <button class="btn ghost" id="resetBtn" type="button">Reset</button>
+        </div>
+        <p class="error-message" id="errorMessage" style="display: none;"></p>
+        <p class="sub" style="margin-top:10px"><strong>Warna tier: S (hijau tua), A (hijau muda), B (kuning), C (oranye), D (merah).</strong></p>
+      </div>
+
+      <!-- Sisi kanan: CTA + hasil + RIWAYAT -->
+      <div>
+        <div class="cta-section">
+          <h2>Penasaran dengan tier makananmu?</h2>
+          <p class="sub">Masukkan data di samping dan klik tombol di bawah untuk melihat hasilnya.</p>
+          <button class="btn" id="checkBtnBottom" type="button">Cek Hasil</button>
+        </div>
+
+        <!-- RIWAYAT -->
+        <div class="card" style="margin-top:16px">
+          <h2>Riwayat</h2>
+          <div id="historyList" class="history-list">
+            <div class="empty-note">Belum ada riwayat.</div>
+          </div>
+          <div class="controls">
+            <button id="clearHistoryBtn" class="btn ghost" type="button">Hapus Semua</button>
+          </div>
+        </div>
+
+        <div id="resultGrid" class="results" aria-live="polite" style="margin-top:16px"></div>
+        <div id="overall" class="conclusion hidden"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Halaman Hasil -->
+  <main id="results-page" style="display:none">
+    <div class="results-header">
+      <h1 id="resultsTitle">Hasil Analisis</h1>
+      <button class="btn ghost" id="backToFormBtn">Kembali</button>
+    </div>
+    <div class="results-content">
+      <div class="overall-summary fade-in">
+        <h2 id="foodNameSummary"></h2>
+        <div id="overallTierBadge" class="tier-badge"></div>
+        <div id="overallConclusion"></div>
+      </div>
+      <div id="nutrientBreakdown" class="results" aria-live="polite"></div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Tip: tekan <kbd>Enter</kbd> saat fokus di input untuk langsung menghitung. Data terakhir & riwayat tersimpan otomatis di perangkat (localStorage). Toggle tema ada di kanan atas.</p>
+  </footer>
+
+<script>
+  /* ===== THEME ===== */
+  const THEME_KEY = 'healthTier:theme';
+  const prefersLight = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('themeToggleBtn');
+    const label = document.getElementById('themeLabel');
+    const icon = document.getElementById('themeIcon');
+    const isLight = theme === 'light';
+    btn.setAttribute('aria-pressed', String(isLight));
+    label.textContent = isLight ? 'Light' : 'Dark';
+    icon.innerHTML = isLight
+      ? <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="2"/></svg>
+      : <svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2"/></svg>;
+  }
+  function initTheme(){
+    const saved = localStorage.getItem(THEME_KEY);
+    const theme = saved || (prefersLight() ? 'light' : 'dark');
+    applyTheme(theme);
+  }
+  function toggleTheme(){
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = (cur === 'dark') ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  }
+  document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+
+  /* ===== PAGE SWITCH ===== */
+  document.getElementById('startBtn').addEventListener('click', function() {
+    document.getElementById('landing-page').style.display = 'none';
+    document.getElementById('calculator-app').style.display = 'grid';
+  });
+
+  /* ===== TIERS (as original) ===== */
+  function tierEnergy(kj){ if(isNaN(kj)) return ''; if(kj<=149) return 'S'; if(kj<=399) return 'A'; if(kj<=799) return 'B'; if(kj<=1399) return 'C'; return 'D'; }
+  function tierFat(g){ if(isNaN(g)) return ''; if(g<=0.5) return 'S'; if(g<=1.5) return 'A'; if(g<=4.9) return 'B'; if(g<=9.9) return 'C'; return 'D'; }
+  function tierSugar(g){ if(isNaN(g)) return ''; if(g<=2) return 'S'; if(g<=5) return 'A'; if(g<=10) return 'B'; if(g<=20) return 'C'; return 'D'; }
+  function tierSodium(mg){ if(isNaN(mg)) return ''; if(mg<=120) return 'S'; if(mg<=300) return 'A'; if(mg<=600) return 'B'; if(mg<=900) return 'C'; return 'D'; }
+  function tierFiber(g){ if(isNaN(g)) return ''; if(g>=6) return 'S'; if(g>=4) return 'A'; if(g>=2) return 'B'; if(g>=1) return 'C'; return 'D'; }
+  function tierProtein(g){ if(isNaN(g)) return ''; if(g>=20) return 'S'; if(g>=12) return 'A'; if(g>=6) return 'B'; if(g>=3) return 'C'; return 'D'; }
+  const tierToScore = t => ({'S':5,'A':4,'B':3,'C':2,'D':1}[t] || 0);
+  const scoreToTier = sc => { if(sc>=4.6) return 'S'; if(sc>=3.6) return 'A'; if(sc>=2.6) return 'B'; if(sc>=1.6) return 'C'; return 'D'; };
+
+  /* ===== ICONS ===== */
+  function iconEnergy(){return <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='ge' x1='0' y1='0' x2='1' y2='1'><stop stop-color='#a2b3ff'/><stop offset='1' stop-color='#ff9de6'/></linearGradient></defs><path d='M13 2 4 14h6l-1 8 9-12h-6l1-8z' fill='url(#ge)'/></svg>}
+  function iconFat(){return <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gf' x1='0' y1='0' x2='1' y2='1'><stop stop-color='#7cf69a'/><stop offset='1' stop-color='#1db954'/></linearGradient></defs><path d='M12 3c-3 3-6 7-6 10a6 6 0 0 0 12 0c0-3-3-7-6-10z' fill='url(#gf)'/></svg>}
+  function iconSugar(){return <svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='gs' x1='0' y1='0' x2='1' y2='1'><stop stop-color='#ffe38b'/><stop offset='1' stop-color='#ffd866'/></linearGradient></defs><path d='M12 2 3 7v10l9 5 9-5V7l-9-5zm0 3.2 6 3.3v6.9l-6 3.3-6-3.3V8.5l6-3.3z' fill='url(#gs)'/></svg>}
+  function iconSodium(){return <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id='gn' x1='0' y1='0' x2='1' y2='1'><stop stop-color='#ffb38a'/><stop offset='1' stop-color='#ff9e64'/></linearGradient></defs><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9 8h6v2H9V8zm0 4h6v2H9v-2zm0 4h6v2H9v-2z" fill="url(#gn)"/></svg>}
+  function iconFiber(){return <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id='gfib' x1='0' y1='0' x2='1' y2='1'><stop stop-color='#7cf69a'/><stop offset='1' stop-color='#0ecf71'/></linearGradient></defs><path d="M12 2C6.477 2 2 6.477 2 12c0 2.227.753 4.28 2 5.922V12h8V4c3.314 0 6 2.686 6 6s-2.686 6-6 6H4v2h8c4.418 0 8-3.582 8-8s-3.582-8-8-8z" fill="url(#gfib)"/></svg>}
+  function iconProtein(){return <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id='gpro' x1='0' y1='0' x2='1' y2='1'><stop stop-color='#a2b3ff'/><stop offset='1' stop-color='#a76cff'/></linearGradient></defs><path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v2a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4v-2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4h-4zm0 4a2 2 0 0 1 2 2v2H8V8a2 2 0 0 1 2-2h2zm4 12a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2h8v2z" fill="url(#gpro)"/></svg>}
+
+  const defs = {
+    energy: {name:'Energi', unit:'kJ', icon: iconEnergy},
+    fat:    {name:'Lemak Jenuh', unit:'g', icon: iconFat},
+    sugar:  {name:'Gula', unit:'g', icon: iconSugar},
+    sodium: {name:'Natrium', unit:'mg', icon: iconSodium},
+    fiber:  {name:'Serat', unit:'g', icon: iconFiber},
+    protein: {name:'Protein', unit:'g', icon: iconProtein},
+  };
+
+  /* ===== NOTES ===== */
+  function noteEnergy(v,t){ const base = <strong>Kandungan energi sebesar ${v} kJ per 100 g.</strong>; switch(t){case'S':return base+` Kategori sangat rendah, <strong>pilihan ideal</strong> untuk menjaga berat badan.;case'A':return base+ Kategori rendah, <strong>sangat baik</strong> untuk konsumsi harian dengan porsi normal.;case'B':return base+ Kategori sedang. <strong>Perlu diperhatikan porsinya</strong> agar asupan kalori harian tidak berlebihan.;case'C':return base+ Kategori cukup tinggi. <strong>Hindari konsumsi berlebihan</strong>, terutama jika Anda sedang mencoba menurunkan berat badan.;default:return base+ Kategori sangat tinggi. <strong>Sebaiknya dihindari</strong> atau dikonsumsi dalam jumlah yang sangat terbatas.`;} }
+  function noteFat(v,t){ const base = <strong>Kandungan lemak jenuh ${v} g per 100 g.</strong>; switch(t){case'S':return base+` Sangat rendah. <strong>Pilihan terbaik</strong> untuk kesehatan jantung dan menjaga kadar kolesterol.;case'A':return base+ Rendah. <strong>Aman untuk diet normal</strong>, namun tetap perhatikan asupan lemak jenuh dari makanan lain.;case'B':return base+ Sedang. <strong>Konsumsi secukupnya</strong>. Pilihan ini kurang ideal jika Anda punya riwayat kolesterol tinggi.;case'C':return base+ Tinggi. <strong>Batasi konsumsi</strong>. Sebaiknya diganti dengan sumber lemak tak jenuh yang lebih sehat.;default:return base+ Sangat tinggi. <strong>Sangat tidak dianjurkan</strong>, terutama bagi penderita penyakit jantung atau kolesterol tinggi.`;} }
+  function noteSugar(v,t){ const base = <strong>Kandungan gula total ${v} g per 100 g.</strong>; switch(t){case'S':return base+` Sangat rendah. <strong>Pilihan terbaik</strong> untuk mengendalikan gula darah dan kesehatan metabolisme.;case'A':return base+ Rendah. <strong>Masih aman untuk dikonsumsi</strong>, namun imbangi dengan makanan yang tidak mengandung gula tambahan.;case'B':return base+ Sedang. <strong>Perhatikan asupan gula Anda</strong>. Kurang ideal untuk penderita diabetes.;case'C':return base+ Tinggi. <strong>Tidak direkomendasikan</strong> untuk penderita diabetes atau mereka yang ingin mengurangi gula.;default:return base+ Sangat tinggi. <strong>Sangat berisiko bagi kesehatan</strong>. Sebaiknya hindari produk ini sepenuhnya.`;} }
+  function noteSodium(v,t){ const base = <strong>Kandungan natrium ${v} mg per 100 g.</strong>; switch(t){case'S':return base+` Sangat rendah. <strong>Pilihan yang ideal</strong> untuk menjaga tekanan darah tetap stabil.;case'A':return base+ Rendah. <strong>Aman untuk dikonsumsi</strong>, bahkan untuk diet rendah garam.;case'B':return base+ Sedang. <strong>Perhatikan asupan garam</strong> dari makanan lain. Waspada jika Anda memiliki riwayat hipertensi.;case'C':return base+ Tinggi. <strong>Dapat meningkatkan risiko hipertensi</strong>. Sebaiknya hindari jika Anda punya riwayat tekanan darah tinggi.;default:return base+ Sangat tinggi. <strong>Hindari atau batasi konsumsi sekeras mungkin</strong>, terutama bagi penderita penyakit ginjal atau hipertensi.`;} }
+  function noteFiber(v,t){ const base = <strong>Kandungan serat ${v} g per 100 g.</strong>; switch(t){case'S':return base+` Sangat tinggi. <strong>Pilihan yang sangat baik</strong> untuk pencernaan dan menjaga rasa kenyang lebih lama.;case'A':return base+ Tinggi. <strong>Pilihan yang baik</strong> untuk memenuhi kebutuhan serat harian.;case'B':return base+ Sedang. Memberikan manfaat serat, namun <strong>sebaiknya dikombinasikan</strong> dengan sumber serat lain.;case'C':return base+ Rendah. Nilai gizi positif dari serat minimal. <strong>Bukan sumber serat yang diandalkan</strong>.;default:return base+ Sangat rendah. <strong>Nilai gizi positif serat sangat minim</strong>.`; } }
+  function noteProtein(v,t){ const base = <strong>Kandungan protein ${v} g per 100 g.</strong>; switch(t){case'S':return base+` Sangat tinggi. <strong>Sumber protein yang luar biasa</strong>, ideal untuk pembentukan dan perbaikan otot.;case'A':return base+ Tinggi. <strong>Pilihan yang sangat baik</strong> untuk membantu memenuhi kebutuhan protein harian Anda.;case'B':return base+ Sedang. Berkontribusi pada asupan protein, namun <strong>perlu diimbangi</strong> dengan sumber lain.;case'C':return base+ Rendah. Nilai protein minimal. <strong>Tidak bisa diandalkan</strong> sebagai sumber protein utama.;default:return base+ Sangat rendah. <strong>Nilai gizi positif protein sangat minim</strong>.`; } }
+  const noteMap = { energy:noteEnergy, fat:noteFat, sugar:noteSugar, sodium:noteSodium, fiber:noteFiber, protein:noteProtein };
+  const tierClass = t => ({S:'tier-s',A:'tier-a',B:'tier-b',C:'tier-c',D:'tier-d'}[t]||'');
+
+  /* ===== RENDER CARD ===== */
+  function renderCard(key, value, tier){
+    const d = defs[key];
+    const note = noteMap[key](value, tier);
+    return `<div class='nutri-card fade-in'>
+      <div class='badge glow ${tierClass(tier)}'>${tier}</div>
+      <div class='nutri-head'>
+        <div class='icon glow'>${d.icon()}</div>
+        <div>
+          <div class='nutri-title'>${d.name}</div>
+          <div class='nutri-value'>${Number(value)} ${d.unit} / 100 g</div>
+        </div>
+      </div>
+      <div class='nutri-note'>${note}</div>
+    </div>`;
+  }
+
+  /* ===== FORM VALUES ===== */
+  function getVals(){
+    return {
+      foodName: document.getElementById('foodName').value,
+      energy: document.getElementById('energy').value,
+      fat:    document.getElementById('fat').value,
+      sugar:  document.getElementById('sugar').value,
+      sodium: document.getElementById('sodium').value,
+      fiber:  document.getElementById('fiber').value,
+      protein: document.getElementById('protein').value,
+    };
+  }
+
+  /* ===== HISTORY ===== */
+  const HISTORY_KEY = 'healthTier:history';
+  function getHistory(){
+    try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch{ return []; }
+  }
+  function setHistory(arr){
+    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+  function saveHistory(entry){
+    const maxItems = 20;
+    const arr = getHistory();
+    // Hindari duplikasi berturut-turut (nilai sama persis)
+    if(arr[0] && JSON.stringify(arr[0].vals) === JSON.stringify(entry.vals)) return;
+    arr.unshift(entry);
+    if(arr.length > maxItems) arr.pop();
+    setHistory(arr);
+    renderHistory();
+  }
+  function formatDate(ts){
+    const d = new Date(ts);
+    return d.toLocaleString('id-ID', { dateStyle:'medium', timeStyle:'short' });
+  }
+  function renderHistory(){
+    const list = document.getElementById('historyList');
+    const arr = getHistory();
+    if(!arr.length){
+      list.innerHTML = <div class="empty-note">Belum ada riwayat.</div>;
+      return;
+    }
+    list.innerHTML = arr.map((it, idx) => `
+      <div class="history-item" data-idx="${idx}">
+        <div>
+          <div class="history-title">${it.foodName || 'Makanan'} <span class="pill ${tierClass(it.overallTier)}">${it.overallTier}</span></div>
+          <div class="history-meta">${formatDate(it.ts)}</div>
+        </div>
+        <div class="history-actions">
+          <button class="btn secondary use-btn" type="button">Gunakan</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('historyList').addEventListener('click', (e)=>{
+    const btn = e.target.closest('.use-btn');
+    if(!btn) return;
+    const item = e.target.closest('.history-item');
+    const idx = Number(item?.dataset?.idx);
+    const arr = getHistory();
+    const it = arr[idx];
+    if(!it) return;
+    // isi form & kembali ke form
+    for(const k in it.vals){ if(document.getElementById(k)) document.getElementById(k).value = it.vals[k]; }
+    document.getElementById('results-page').style.display='none';
+    document.getElementById('calculator-app').style.display='grid';
+    // opsional langsung hitung:
+    // calculate();
+  });
+  document.getElementById('clearHistoryBtn').addEventListener('click', ()=>{
+    setHistory([]);
+    renderHistory();
+  });
+
+  /* ===== CALCULATE ===== */
+  function calculate(){
+    const vals = getVals();
+    const errorMessage = document.getElementById('errorMessage');
+
+    const isAnyEmpty = Object.values(vals).some(val => val === '' || val === null || val === undefined);
+    if (isAnyEmpty) {
+      errorMessage.textContent = '*mohon isi semua data terlebih dahulu sebelum dicek';
+      errorMessage.style.display = 'block';
+      return;
+    }
+    errorMessage.style.display = 'none';
+
+    const foodName = vals.foodName || 'Makanan';
+    const energy = Number(vals.energy);
+    const fat = Number(vals.fat);
+    const sugar = Number(vals.sugar);
+    const sodium = Number(vals.sodium);
+    const fiber = Number(vals.fiber);
+    const protein = Number(vals.protein);
+
+    const TE = tierEnergy(energy);
+    const TF = tierFat(fat);
+    const TS = tierSugar(sugar);
+    const TN = tierSodium(sodium);
+    const TFIB = tierFiber(fiber);
+    const TPRO = tierProtein(protein);
+
+    const grid = document.getElementById('nutrientBreakdown');
+    grid.innerHTML = [
+      renderCard('energy', energy, TE),
+      renderCard('fat',    fat,    TF),
+      renderCard('sugar',  sugar,  TS),
+      renderCard('sodium', sodium, TN),
+      renderCard('fiber',  fiber,  TFIB),
+      renderCard('protein', protein, TPRO)
+    ].join('');
+
+    const avgScore = (tierToScore(TE)+tierToScore(TF)+tierToScore(TS)+tierToScore(TN)+tierToScore(TFIB)+tierToScore(TPRO))/6;
+    const overallTier = scoreToTier(avgScore);
+
+    document.getElementById('foodNameSummary').textContent = Kesimpulan untuk: ${foodName};
+    const overallTierBadge = document.getElementById('overallTierBadge');
+    overallTierBadge.textContent = overallTier;
+    overallTierBadge.className = tier-badge glow ${tierClass(overallTier)};
+
+    let conclusionHtml = <p>Secara keseluruhan, produk ini memperoleh tier <strong>${overallTier}</strong> berdasarkan analisis gabungan.</p>;
+    const findings = [];
+    if (TE === 'S' || TE === 'A') findings.push(energinya rendah (Tier ${TE}));
+    if (TF === 'S' || TF === 'A') findings.push(lemak jenuhnya rendah (Tier ${TF}));
+    if (TS === 'S' || TS === 'A') findings.push(gulanya rendah (Tier ${TS}));
+    if (TN === 'S' || TN === 'A') findings.push(natriumnya rendah (Tier ${TN}));
+    if (TFIB === 'S' || TFIB === 'A') findings.push(seratnya tinggi (Tier ${TFIB}));
+    if (TPRO === 'S' || TPRO === 'A') findings.push(proteinnya tinggi (Tier ${TPRO}));
+    if (findings.length > 0) {
+      conclusionHtml += <p>Hasil ini didukung oleh beberapa aspek positif, seperti ${findings.slice(0, -1).join(', ')}${findings.length > 1 ? ' dan' : ''} ${findings[findings.length-1]}.</p>;
+    }
+    const negativeFindings = [];
+    if (TE === 'C' || TE === 'D') negativeFindings.push(energinya tinggi (Tier ${TE}));
+    if (TF === 'C' || TF === 'D') negativeFindings.push(lemak jenuhnya tinggi (Tier ${TF}));
+    if (TS === 'C' || TS === 'D') negativeFindings.push(gulanya tinggi (Tier ${TS}));
+    if (TN === 'C' || TN === 'D') negativeFindings.push(natriumnya tinggi (Tier ${TN}));
+    if (TFIB === 'C' || TFIB === 'D') negativeFindings.push(seratnya rendah (Tier ${TFIB}));
+    if (TPRO === 'C' || TPRO === 'D') negativeFindings.push(proteinnya rendah (Tier ${TPRO}));
+    if (negativeFindings.length > 0) {
+      conclusionHtml += <p>Namun, perlu diperhatikan beberapa aspek negatif, seperti ${negativeFindings.slice(0, -1).join(', ')}${negativeFindings.length > 1 ? ' dan' : ''} ${negativeFindings[negativeFindings.length-1]}.</p>;
+    }
+    if (overallTier === 'S' || overallTier === 'A') {
+      conclusionHtml += <p><strong>Rekomendasi:</strong> Makanan ini adalah pilihan yang sangat dianjurkan untuk diet seimbang.</p>;
+    } else if (overallTier === 'B') {
+      conclusionHtml += <p><strong>Rekomendasi:</strong> Konsumsi dengan porsi yang wajar dan kombinasikan dengan makanan lain yang memiliki tier lebih tinggi untuk melengkapi nutrisi.</p>;
+    } else {
+      conclusionHtml += <p><strong>Rekomendasi:</strong> Sangat disarankan untuk membatasi konsumsi produk ini atau mencari alternatif lain yang lebih sehat dengan profil nutrisi yang lebih baik.</p>;
+    }
+    document.getElementById('overallConclusion').innerHTML = conclusionHtml;
+
+    // Tampilkan halaman hasil
+    document.getElementById('calculator-app').style.display = 'none';
+    document.getElementById('results-page').style.display = 'block';
+
+    // Simpan "terakhir"
+    try{ localStorage.setItem('healthTier:last', JSON.stringify(vals)); }catch(e){}
+
+    // Simpan ke RIWAYAT
+    saveHistory({
+      ts: Date.now(),
+      foodName,
+      overallTier,
+      vals
+    });
+  }
+
+  // Navigasi
+  document.getElementById('backToFormBtn').addEventListener('click', () => {
+    document.getElementById('calculator-app').style.display = 'grid';
+    document.getElementById('results-page').style.display = 'none';
+  });
+
+  // ===== helpers: sample + reset + enter submit + restore =====
+  function fillSample(){
+    const sample = { foodName: 'Burger Keju', energy: '1100', fat: '12.5', sugar: '4.8', sodium: '580', fiber: '3.5', protein: '15.0' };
+    for(const k in sample){ document.getElementById(k).value = sample[k]; }
+    calculate();
+  }
+  function resetForm(){
+    ['foodName','energy','fat','sugar','sodium','fiber','protein'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('results-page').style.display='none';
+    document.getElementById('calculator-app').style.display='grid';
+    document.getElementById('errorMessage').style.display = 'none';
+  }
+  function handleEnterToCalculate(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      calculate();
+    }
+  }
+  function restoreLast(){
+    try{
+      const last = JSON.parse(localStorage.getItem('healthTier:last')||'null');
+      if(last){
+        for(const k in last){ if(document.getElementById(k)) document.getElementById(k).value = last[k]; }
+      }
+    }catch(e){}
+  }
+
+  document.getElementById('checkBtn').addEventListener('click', calculate);
+  document.getElementById('sampleBtn').addEventListener('click', fillSample);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.getElementById('checkBtnBottom').addEventListener('click', calculate);
+  ['foodName','energy','fat','sugar','sodium','fiber','protein'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown', handleEnterToCalculate);
+  });
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    initTheme();
+    restoreLast();
+    renderHistory();
+  });
+</script>
+</body>
+</html>
